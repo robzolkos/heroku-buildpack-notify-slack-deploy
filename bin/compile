@@ -18,18 +18,12 @@ export_env_dir $3
 SLACK_MESSAGE="{
   \"blocks\": [
     {
-      \"type\": \"header\",
-      \"text\": {
-        \"type\": \"plain_text\",
-        \"text\": \"🚀 Deployment Notification\"
-      }
-    },
-    {
       \"type\": \"section\",
       \"text\": {
         \"type\": \"mrkdwn\",
-        \"text\": \"*$HEROKU_APP_NAME* has been successfully deployed.\"
+        \"text\": \"🟢 *[Dev] Build deployed successfully*\"
       }
+    }
     }"
 
 if [[ -z "${DEPLOY_NOTIFY_GITHUB_AUTH_TOKEN}" || -z "${DEPLOY_NOTIFY_GITHUB_ORG}" || -z "${DEPLOY_NOTIFY_GITHUB_PROJECT}" || -z "${SOURCE_VERSION}" ]]; then
