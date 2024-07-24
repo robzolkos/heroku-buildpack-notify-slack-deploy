@@ -56,7 +56,7 @@ else
           \"text\": \"By <mailto:$AUTHOR_EMAIL|$AUTHOR_NAME> on \`$HEROKU_APP_NAME\` | $AUTHOR_EMAIL | via GitHub | $(date +'%b %d at %I:%M %p')\"
         }
       ]
-    }
+    },
     {
       \"type\": \"actions\",
       \"elements\": [
