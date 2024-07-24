@@ -45,7 +45,7 @@ else
       \"type\": \"section\",
       \"text\": {
         \"type\": \"mrkdwn\",
-        \"text\": \"*Commit Details*\n\n🧩 $COMMIT_MESSAGE\n\n<small>By <mailto:$AUTHOR_EMAIL|$AUTHOR_NAME></small>\"
+        \"text\": \"*Commit Details*\n\n🧩 $COMMIT_MESSAGE\n\n>By <mailto:$AUTHOR_EMAIL|$AUTHOR_NAME>\"
       }
     },
     {
