@@ -52,8 +52,21 @@ else
       \"type\": \"section\",
       \"text\": {
         \"type\": \"mrkdwn\",
-        \"text\": \"*Commit Details*\n\n👤 Author: $AUTHOR_NAME ($AUTHOR_EMAIL)\n📝 Message: $COMMIT_MESSAGE\n🔗 <$COMMIT_URL|View on GitHub>\"
+        \"text\": \"*Commit Details*\n\n📝 $COMMIT_MESSAGE\n\n_<mailto:$AUTHOR_EMAIL|$AUTHOR_NAME>_\"
       }
+    },
+    {
+      \"type\": \"actions\",
+      \"elements\": [
+        {
+          \"type\": \"button\",
+          \"text\": {
+            \"type\": \"plain_text\",
+            \"text\": \"View on GitHub\"
+          },
+          \"url\": \"$COMMIT_URL\"
+        }
+      ]
     }
   ]
 }"
