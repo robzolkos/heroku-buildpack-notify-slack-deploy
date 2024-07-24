@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 export_env_dir() {
-  # from https://devcenter.heroku.com/articles/buildpack-api#bin-compile
   env_dir=$1
   whitelist_regex=${2:-''}
   blacklist_regex=${3:-'^(PATH|GIT_DIR|CPATH|CPPATH|LD_PRELOAD|LIBRARY_PATH)$'}
@@ -16,26 +15,52 @@ export_env_dir() {
 
 export_env_dir $3
 
-SLACK_MESSAGE="*$HEROKU_APP_NAME* was deployed"
+SLACK_MESSAGE="{
+  \"blocks\": [
+    {
+      \"type\": \"header\",
+      \"text\": {
+        \"type\": \"plain_text\",
+        \"text\": \"🚀 Deployment Notification\"
+      }
+    },
+    {
+      \"type\": \"section\",
+      \"text\": {
+        \"type\": \"mrkdwn\",
+        \"text\": \"*$HEROKU_APP_NAME* has been successfully deployed.\"
+      }
+    }"
 
-if [[ -z "${DEPLOY_NOTIFY_GITHUB_AUTH_TOKEN}" || -z "${DEPLOY_NOTIFY_GITHUB_ORG}" || -z "${DEPLOY_NOTIFY_GITHUB_PROJECT}" ]]; then
-  # Not loading Github Data
-  SLACK_MESSAGE="$SLACK_MESSAGE"
-elif [[ -z "${SOURCE_VERSION}" ]]; then
-  # We don't have the current git sha
-  SLACK_MESSAGE="$SLACK_MESSAGE"
+if [[ -z "${DEPLOY_NOTIFY_GITHUB_AUTH_TOKEN}" || -z "${DEPLOY_NOTIFY_GITHUB_ORG}" || -z "${DEPLOY_NOTIFY_GITHUB_PROJECT}" || -z "${SOURCE_VERSION}" ]]; then
+  SLACK_MESSAGE="$SLACK_MESSAGE
+  ]
+}"
 else
   echo "-----> Loading commit information from Github"
   COMMIT_JSON=$(curl -H "Authorization: token $DEPLOY_NOTIFY_GITHUB_AUTH_TOKEN" https://api.github.com/repos/$DEPLOY_NOTIFY_GITHUB_ORG/$DEPLOY_NOTIFY_GITHUB_PROJECT/commits/$SOURCE_VERSION)
-  AUTHOR_NAME=$(echo "$COMMIT_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin, strict=False)['commit']['author']['name'])" || echo '')
-  AUTHOR_EMAIL=$(echo "$COMMIT_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin, strict=False)['commit']['author']['email'])"  || echo '')
-  COMMIT_MESSAGE=$((echo "$COMMIT_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin, strict=False)['commit']['message'])" || echo '') | head -n 1)
-  COMMIT_URL=$(echo "$COMMIT_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin, strict=False)['html_url'])" || echo 'Can not reach Github...')
-  SLACK_MESSAGE="*$HEROKU_APP_NAME* was deployed\n>$AUTHOR_NAME - $AUTHOR_EMAIL\n\n\`\`\`\n$COMMIT_MESSAGE\n\`\`\`\n$COMMIT_URL"
+  AUTHOR_NAME=$(echo "$COMMIT_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin, strict=False)['commit']['author']['name'])" || echo 'Unknown')
+  AUTHOR_EMAIL=$(echo "$COMMIT_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin, strict=False)['commit']['author']['email'])"  || echo 'Unknown')
+  COMMIT_MESSAGE=$((echo "$COMMIT_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin, strict=False)['commit']['message'])" || echo 'No commit message available') | head -n 1)
+  COMMIT_URL=$(echo "$COMMIT_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin, strict=False)['html_url'])" || echo 'https://github.com')
+
+  SLACK_MESSAGE="$SLACK_MESSAGE,
+    {
+      \"type\": \"divider\"
+    },
+    {
+      \"type\": \"section\",
+      \"text\": {
+        \"type\": \"mrkdwn\",
+        \"text\": \"*Commit Details*\n\n👤 Author: $AUTHOR_NAME ($AUTHOR_EMAIL)\n📝 Message: $COMMIT_MESSAGE\n🔗 <$COMMIT_URL|View on GitHub>\"
+      }
+    }
+  ]
+}"
 fi
 
 echo "-----> Notifying Slack that the deploy is complete"
-echo "       $SLACK_MESSAGE"
-curl -s -X POST -H 'Content-type: application/json' --data "{\"text\":\"$SLACK_MESSAGE\"}" $SLACK_DEPLOYMENT_WEBHOOK_URL
+echo "       Sending deployment notification to Slack"
+curl -s -X POST -H 'Content-type: application/json' --data "$SLACK_MESSAGE" $SLACK_DEPLOYMENT_WEBHOOK_URL
 echo ""
-echo ""
+echo "-----> Slack notification sent successfully"
