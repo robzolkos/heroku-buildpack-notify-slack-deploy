@@ -23,13 +23,6 @@ SLACK_MESSAGE="{
         \"type\": \"mrkdwn\",
         \"text\": \"🟢 *[Dev] Build deployed successfully*\"
       }
-    },
-    {
-      \"type\": \"section\",
-      \"text\": {
-        \"type\": \"mrkdwn\",
-        \"text\": \"*$HEROKU_APP_NAME* has been successfully deployed.\"
-      }
     }"
 
 if [[ -z "${DEPLOY_NOTIFY_GITHUB_AUTH_TOKEN}" || -z "${DEPLOY_NOTIFY_GITHUB_ORG}" || -z "${DEPLOY_NOTIFY_GITHUB_PROJECT}" || -z "${SOURCE_VERSION}" ]]; then
@@ -52,7 +45,7 @@ else
       \"type\": \"section\",
       \"text\": {
         \"type\": \"mrkdwn\",
-        \"text\": \"*Commit Details*\n\n📝 $COMMIT_MESSAGE\n\n_<mailto:$AUTHOR_EMAIL|$AUTHOR_NAME>_\"
+        \"text\": \"*Commit Details*\n\n🧩 $COMMIT_MESSAGE\n\n<small>By <mailto:$AUTHOR_EMAIL|$AUTHOR_NAME></small>\"
       }
     },
     {
