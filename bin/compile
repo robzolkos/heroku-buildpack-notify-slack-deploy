@@ -23,21 +23,7 @@ SLACK_MESSAGE="{
         \"type\": \"mrkdwn\",
         \"text\": \"🚀 *[$HEROKU_APP_NAME] deployed successfully*\"
       }
-    }]"
-
-if [[ -z "${DEPLOY_NOTIFY_GITHUB_AUTH_TOKEN}" || -z "${DEPLOY_NOTIFY_GITHUB_ORG}" || -z "${DEPLOY_NOTIFY_GITHUB_PROJECT}" || -z "${SOURCE_VERSION}" ]]; then
-  SLACK_MESSAGE="$SLACK_MESSAGE
-  ]
-}"
-else
-  echo "-----> Loading commit information from Github"
-  COMMIT_JSON=$(curl -H "Authorization: token $DEPLOY_NOTIFY_GITHUB_AUTH_TOKEN" https://api.github.com/repos/$DEPLOY_NOTIFY_GITHUB_ORG/$DEPLOY_NOTIFY_GITHUB_PROJECT/commits/$SOURCE_VERSION)
-  AUTHOR_NAME=$(echo "$COMMIT_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin, strict=False)['commit']['author']['name'])" || echo 'Unknown')
-  AUTHOR_EMAIL=$(echo "$COMMIT_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin, strict=False)['commit']['author']['email'])"  || echo 'Unknown')
-  COMMIT_MESSAGE=$((echo "$COMMIT_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin, strict=False)['commit']['message'])" || echo 'No commit message available') | head -n 1)
-  COMMIT_URL=$(echo "$COMMIT_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin, strict=False)['html_url'])" || echo 'https://github.com')
-}"
-fi
+    }]}"
 
 echo "-----> Notifying Slack that the deploy is complete"
 echo "       Sending deployment notification to Slack"
