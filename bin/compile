@@ -21,7 +21,7 @@ SLACK_MESSAGE="{
       \"type\": \"section\",
       \"text\": {
         \"type\": \"mrkdwn\",
-        \"text\": \"🚀 *[$HEROKU_APP_NAME] deployed successfully*\"
+        \"text\": \"🚀 *[$DEPLOY_NAME] deployed successfully*\"
       }
     }]}"
 
