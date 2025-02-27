@@ -21,9 +21,9 @@ SLACK_MESSAGE="{
       \"type\": \"section\",
       \"text\": {
         \"type\": \"mrkdwn\",
-        \"text\": \"🟢 *[Dev] Build deployed successfully*\"
+        \"text\": \"🚀 *[$HEROKU_APP_NAME] deployed successfully*\"
       }
-    }"
+    }]"
 
 if [[ -z "${DEPLOY_NOTIFY_GITHUB_AUTH_TOKEN}" || -z "${DEPLOY_NOTIFY_GITHUB_ORG}" || -z "${DEPLOY_NOTIFY_GITHUB_PROJECT}" || -z "${SOURCE_VERSION}" ]]; then
   SLACK_MESSAGE="$SLACK_MESSAGE
@@ -36,41 +36,6 @@ else
   AUTHOR_EMAIL=$(echo "$COMMIT_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin, strict=False)['commit']['author']['email'])"  || echo 'Unknown')
   COMMIT_MESSAGE=$((echo "$COMMIT_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin, strict=False)['commit']['message'])" || echo 'No commit message available') | head -n 1)
   COMMIT_URL=$(echo "$COMMIT_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin, strict=False)['html_url'])" || echo 'https://github.com')
-
-  SLACK_MESSAGE="$SLACK_MESSAGE,
-    {
-      \"type\": \"divider\"
-    },
-    {
-      \"type\": \"section\",
-      \"text\": {
-        \"type\": \"mrkdwn\",
-        \"text\": \"*Commit Details*\n\n🧩 $COMMIT_MESSAGE\"
-      }
-    },
-    {
-      \"type\": \"context\",
-      \"elements\": [
-        {
-          \"type\": \"mrkdwn\",
-          \"text\": \"By <mailto:$AUTHOR_EMAIL|$AUTHOR_NAME> on \`$HEROKU_APP_NAME\` | $AUTHOR_EMAIL | via GitHub | $(date +'%b %d at %I:%M %p')\"
-        }
-      ]
-    },
-    {
-      \"type\": \"actions\",
-      \"elements\": [
-        {
-          \"type\": \"button\",
-          \"text\": {
-            \"type\": \"plain_text\",
-            \"text\": \"View on GitHub\"
-          },
-          \"url\": \"$COMMIT_URL\"
-        }
-      ]
-    }
-  ]
 }"
 fi
 
